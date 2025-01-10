@@ -1,57 +1,55 @@
 #include <bits/stdc++.h>
+
 using namespace std;
+
+const int inf = 1e9;
 
 int main()
 {
 	int h, w;
 	cin >> h >> w;
-
-	char hm[h][w], vm[h][w];
-	pair<int, int> start, end;
+	vector <string> s(h);
+	int si, sj, gi, gj;
 	for (int i = 0; i < h; i++)
 	{
-		string s;
-		cin >> s;
-		for (int j = 0; j < s.size(); j++)
+		cin >> s[i];
+		for (int j = 0; j < w; j++)
 		{
-			hm[i][j] = s[j];
-			vm[i][j] = s[j];
-
-			if (s[j] == 'S')
-			{
-				start.first = i;
-				start.second = j;
-			}
-			else if (s[j] == 'G')
-			{
-				end.first = i;
-				end.second = j;
-			}
+			if (s[i][j] == 'S') si = i, sj = j;
+			else if (s[i][j] == 'G') gi = i, gj = j;
 		}
 	}
-
-	queue<pair<int,int>> hq, vq;
-	hq.push(start);
-	vq.push(start);
-
-	int ans = 0;
-
-	bool div = true;
-	while (true)
+	vector< vector< pair<int, int> > > walk(2);
+	walk[0] = { {0, 1}, {0, -1} };
+	walk[1] = { {1, 0}, {-1, 0} };
+	int ans = inf;
+	for (int k = 0; k < 2; k++)
 	{
-		if (hq.size() == 0 && vq.size() == 0)
+		vector d(h, vector(w, inf));
+		d[si][sj] = 0;
+		queue<pair<int, int> > a;
+		a.push(make_pair(si, sj));
+		while (!a.empty())
 		{
-			cout << -1;
-			return 0;
-		}
-
-		if (hq.size())
-		{
-			if (div)
+			auto [i, j] = a.front();
+			a.pop();
+			for (auto [x, y] : walk[(i + j + k) & 1])
 			{
-
+				int ni = i + x, nj = j + y;
+				if (ni >= h || ni < 0 || nj >= w || nj < 0) continue;
+				if (s[ni][nj] == '#') continue;
+				if (d[ni][nj] != inf) continue;
+				d[ni][nj] = d[i][j] + 1;
+				a.push(make_pair(ni, nj));
+				if (ni == gi && nj == gj)
+				{
+					break;
+				}
 			}
 		}
+		ans = min(ans, d[gi][gj]);
 	}
+	if (ans == inf) cout << -1;
+	else cout << ans;
 	return 0;
 }
